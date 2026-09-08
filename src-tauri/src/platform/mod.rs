@@ -7,13 +7,16 @@ mod windows;
 
 pub struct BrowserHost {
     #[cfg(target_os = "linux")]
-    pub(crate) root: gtk::Overlay,
+    pub(crate) root: gtk::Fixed,
 }
 
 pub struct PlatformPage {
     pub(crate) webview: wry::WebView,
-    #[cfg(target_os = "linux")]
-    pub(crate) host: gtk::Overlay,
+}
+
+#[cfg(target_os = "linux")]
+pub fn apply_pre_init_compatibility() {
+    linux::apply_pre_init_compatibility();
 }
 
 impl BrowserHost {

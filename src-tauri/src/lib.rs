@@ -4,6 +4,11 @@ mod window;
 
 use browser::commands::*;
 
+#[cfg(target_os = "linux")]
+pub fn apply_pre_init_compatibility() {
+    platform::apply_pre_init_compatibility();
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     eprintln!("photon: starting");

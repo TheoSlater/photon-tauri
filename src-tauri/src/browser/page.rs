@@ -1,9 +1,9 @@
 use super::BrowserResult;
-use super::{events::BrowserEvent, ids::*, navigation::NavigationRequest};
+use super::{events::BrowserEvent, ids::*, layout, navigation::NavigationRequest};
 use crate::platform;
 use serde::{Deserialize, Serialize};
 use std::{cell::RefCell, rc::Rc};
-use wry::{dpi::LogicalPosition, dpi::LogicalSize, Rect};
+use wry::Rect;
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct PageState {
@@ -40,9 +40,11 @@ impl BrowserPage {
         let page_events = events.clone();
         let title_state = Rc::clone(&state);
         let title_events = events.clone();
+        let bounds = Self::viewport_bounds(window)?;
         let webview = super::webview::BrowserWebView::create(
             window,
             host,
+            bounds,
             &url,
             move |url| {
                 navigation_state.borrow_mut().url = Some(url.clone());
@@ -167,12 +169,12 @@ impl BrowserPage {
         Ok(())
     }
 
-    pub fn full_bounds(window: &tauri::Window) -> BrowserResult<Rect> {
+    pub fn viewport_bounds(window: &tauri::Window) -> BrowserResult<Rect> {
         let size = window.inner_size()?;
         let scale = window.scale_factor()?;
-        Ok(Rect {
-            position: LogicalPosition::new(0.0, 0.0).into(),
-            size: LogicalSize::new(size.width as f64 / scale, size.height as f64 / scale).into(),
-        })
+        Ok(layout::page_bounds(
+            size.width as f64 / scale,
+            size.height as f64 / scale,
+        ))
     }
 }

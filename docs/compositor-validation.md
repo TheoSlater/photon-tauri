@@ -12,6 +12,25 @@ Run Photon on a real desktop session. Do not count startup logs as visual valida
 6. Close window. Confirm `photon: webviews destroyed` appears.
 7. Repeat under Wayland and X11 when available.
 
+### NVIDIA + Wayland compatibility
+
+Photon automatically sets `__NV_DISABLE_EXPLICIT_SYNC=1` before GTK/WebKitGTK
+initialization when it detects Wayland and the NVIDIA kernel modules. Existing
+user values always win. Set `PHOTON_DISABLE_LINUX_GPU_WORKAROUNDS=1` to disable
+the automatic compatibility behavior for testing.
+
+If WebKitGTK still fails to render, use this manual last-resort fallback:
+
+```bash
+# Preferred affected-NVIDIA workaround
+__NV_DISABLE_EXPLICIT_SYNC=1 photon
+
+# Last-resort WebKit fallback; may reduce rendering performance
+WEBKIT_DISABLE_DMABUF_RENDERER=1 photon
+```
+
+Photon never sets `WEBKIT_DISABLE_DMABUF_RENDERER` automatically.
+
 ## Windows
 
 1. Launch Photon with WebView2 installed.

@@ -1,3 +1,7 @@
+mod compatibility;
+
+pub use compatibility::apply_pre_init_compatibility;
+
 use gtk::prelude::*;
 use wry::{WebViewBuilder, WebViewBuilderExtUnix};
 
@@ -5,7 +9,9 @@ use super::{BrowserHost, PlatformPage};
 
 pub fn new_host(window: &tauri::Window) -> Result<BrowserHost, wry::Error> {
     eprintln!("photon: backend = webkitgtk, render_mode = composited");
-    let root = gtk::Overlay::new();
+    // Wry applies Linux webview bounds through GtkFixed::put/size_allocate.
+    // Keeping one fixed host gives every page the same window coordinate space.
+    let root = gtk::Fixed::new();
     root.set_hexpand(true);
     root.set_vexpand(true);
     window
@@ -21,14 +27,6 @@ pub fn build_page<'a>(
     host: &BrowserHost,
     builder: WebViewBuilder<'a>,
 ) -> Result<PlatformPage, wry::Error> {
-    let page_host = gtk::Overlay::new();
-    page_host.set_hexpand(true);
-    page_host.set_vexpand(true);
-    host.root.add_overlay(&page_host);
-    let webview = builder.build_gtk(&page_host)?;
-    page_host.show_all();
-    Ok(PlatformPage {
-        webview,
-        host: page_host,
-    })
+    let webview = builder.build_gtk(&host.root)?;
+    Ok(PlatformPage { webview })
 }

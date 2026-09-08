@@ -2302,7 +2302,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "uuid",
- "wry 0.57.0",
+ "wry 0.55.1",
 ]
 
 [[package]]
@@ -4536,7 +4536,7 @@ dependencies = [
 [[package]]
 name = "wry"
 version = "0.57.0"
-source = "git+https://github.com/TheoSlater/wry?branch=dev#1b20894680c35edefcfde1f509c6bf535b3c3798"
+source = "git+https://github.com/TheoSlater/wry?branch=dev#125a006db9e9a8570aa7960d7891a96a5ac61910"
 dependencies = [
  "base64 0.22.1",
  "block2",

@@ -1,7 +1,5 @@
 use super::BrowserResult;
 use crate::platform;
-#[cfg(target_os = "linux")]
-use gtk::prelude::*;
 use wry::{Rect, WebViewBuilder, WebViewRenderMode};
 
 pub struct BrowserWebView {
@@ -12,6 +10,7 @@ impl BrowserWebView {
     pub fn create(
         window: &tauri::Window,
         host: &platform::BrowserHost,
+        bounds: Rect,
         url: &str,
         navigation: impl Fn(String) -> bool + 'static,
         load: impl Fn(wry::PageLoadEvent, String) + 'static,
@@ -19,6 +18,7 @@ impl BrowserWebView {
     ) -> BrowserResult<Self> {
         let builder = WebViewBuilder::new()
             .with_render_mode(WebViewRenderMode::Composited)
+            .with_bounds(bounds)
             .with_focused(false)
             .with_navigation_handler(navigation)
             .with_on_page_load_handler(load)
@@ -61,8 +61,6 @@ impl BrowserWebView {
     }
     pub fn set_visible(&self, visible: bool) -> BrowserResult<()> {
         self.page.webview.set_visible(visible)?;
-        #[cfg(target_os = "linux")]
-        self.page.host.set_visible(visible);
         Ok(())
     }
     pub fn set_bounds(&self, bounds: Rect) -> BrowserResult<()> {

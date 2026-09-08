@@ -1,6 +1,7 @@
 pub mod commands;
 pub mod events;
 pub mod ids;
+pub mod layout;
 pub mod navigation;
 pub mod page;
 pub mod tab;

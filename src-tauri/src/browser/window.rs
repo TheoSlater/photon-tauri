@@ -95,7 +95,7 @@ impl BrowserWindow {
             }
             self.tabs.activate(tab_id)?;
         }
-        let bounds = BrowserPage::full_bounds(&self.native)?;
+        let bounds = BrowserPage::viewport_bounds(&self.native)?;
         let tab = self.tabs.get_mut(tab_id).ok_or("unknown tab")?;
         tab.page.set_bounds(bounds)?;
         tab.page.set_visible(true)?;
@@ -146,7 +146,7 @@ impl BrowserWindow {
 
     pub fn resize(&mut self) -> BrowserResult<()> {
         if let Some(tab_id) = self.tabs.active_id() {
-            let bounds = BrowserPage::full_bounds(&self.native)?;
+            let bounds = BrowserPage::viewport_bounds(&self.native)?;
             if let Some(tab) = self.tabs.get(tab_id) {
                 tab.page.set_bounds(bounds)?;
             }
