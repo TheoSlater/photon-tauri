@@ -20,7 +20,7 @@ pub fn apply_pre_init_compatibility() {
 }
 
 impl BrowserHost {
-    pub fn new(window: &tauri::Window) -> Result<Self, wry::Error> {
+    pub fn new(window: &tauri::WebviewWindow) -> Result<Self, wry::Error> {
         #[cfg(target_os = "linux")]
         return linux::new_host(window);
         #[cfg(target_os = "macos")]
@@ -31,7 +31,7 @@ impl BrowserHost {
 }
 
 pub fn build_page<'a>(
-    window: &tauri::Window,
+    window: &tauri::WebviewWindow,
     host: &BrowserHost,
     builder: wry::WebViewBuilder<'a>,
 ) -> Result<PlatformPage, wry::Error> {

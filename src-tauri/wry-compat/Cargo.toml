@@ -20,6 +20,5 @@ transparent = []
 
 [dependencies.photon-wry]
 package = "wry"
-git = "https://github.com/TheoSlater/wry"
-branch = "dev"
+path = "../../../wry"
 default-features = false

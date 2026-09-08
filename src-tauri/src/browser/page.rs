@@ -1,5 +1,7 @@
 use super::BrowserResult;
-use super::{events::BrowserEvent, ids::*, layout, navigation::NavigationRequest};
+use super::{
+    events::BrowserEvent, ids::*, navigation::NavigationRequest, viewport::ViewportBounds,
+};
 use crate::platform;
 use serde::{Deserialize, Serialize};
 use std::{cell::RefCell, rc::Rc};
@@ -24,12 +26,13 @@ pub struct BrowserPage {
 
 impl BrowserPage {
     pub fn create(
-        window: &tauri::Window,
+        window: &tauri::WebviewWindow,
         host: &platform::BrowserHost,
         id: PageId,
         url: String,
         tab_id: TabId,
         events: super::events::EventQueue,
+        initial_viewport: ViewportBounds,
     ) -> BrowserResult<Self> {
         let state = Rc::new(RefCell::new(PageState {
             url: Some(url.clone()),
@@ -40,11 +43,10 @@ impl BrowserPage {
         let page_events = events.clone();
         let title_state = Rc::clone(&state);
         let title_events = events.clone();
-        let bounds = Self::viewport_bounds(window)?;
         let webview = super::webview::BrowserWebView::create(
             window,
             host,
-            bounds,
+            initial_viewport.to_rect(),
             &url,
             move |url| {
                 navigation_state.borrow_mut().url = Some(url.clone());
@@ -160,6 +162,11 @@ impl BrowserPage {
         Ok(())
     }
 
+    pub fn set_viewport(&mut self, bounds: ViewportBounds) -> BrowserResult<()> {
+        self.set_bounds(bounds.to_rect())?;
+        self.set_visible(bounds.has_area())
+    }
+
     pub fn refresh_history_state(&mut self) -> BrowserResult<()> {
         if let Some(webview) = &self.webview {
             let mut state = self.state.borrow_mut();
@@ -167,14 +174,5 @@ impl BrowserPage {
             state.can_go_forward = webview.can_go_forward()?;
         }
         Ok(())
-    }
-
-    pub fn viewport_bounds(window: &tauri::Window) -> BrowserResult<Rect> {
-        let size = window.inner_size()?;
-        let scale = window.scale_factor()?;
-        Ok(layout::page_bounds(
-            size.width as f64 / scale,
-            size.height as f64 / scale,
-        ))
     }
 }

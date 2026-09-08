@@ -6,6 +6,7 @@ use super::{
     page::BrowserPage,
     tab::{Tab, TabSnapshot},
     tabs::TabManager,
+    viewport::ViewportBounds,
 };
 use crate::platform;
 use serde::Serialize;
@@ -15,11 +16,12 @@ pub const DEFAULT_URL: &str = "https://www.google.com";
 
 pub struct BrowserWindow {
     pub id: BrowserWindowId,
-    native: tauri::Window,
+    native: tauri::WebviewWindow,
     host: platform::BrowserHost,
     tabs: TabManager,
     events: EventQueue,
     app: tauri::AppHandle,
+    current_viewport: ViewportBounds,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -29,7 +31,7 @@ pub struct BrowserStateSnapshot {
 }
 
 impl BrowserWindow {
-    pub fn create(native: tauri::Window, app: tauri::AppHandle) -> BrowserResult<Self> {
+    pub fn create(native: tauri::WebviewWindow, app: tauri::AppHandle) -> BrowserResult<Self> {
         let host = platform::BrowserHost::new(&native)?;
         let mut browser = Self {
             id: BrowserWindowId::new(),
@@ -38,6 +40,7 @@ impl BrowserWindow {
             tabs: TabManager::new(),
             events: Rc::new(RefCell::new(Vec::new())),
             app,
+            current_viewport: ViewportBounds::default(),
         };
         browser.create_tab(DEFAULT_URL.to_string())?;
         Ok(browser)
@@ -52,6 +55,7 @@ impl BrowserWindow {
             url,
             tab_id,
             self.events.clone(),
+            self.current_viewport,
         )?;
         let mut tab = Tab {
             id: tab_id,
@@ -95,11 +99,11 @@ impl BrowserWindow {
             }
             self.tabs.activate(tab_id)?;
         }
-        let bounds = BrowserPage::viewport_bounds(&self.native)?;
         let tab = self.tabs.get_mut(tab_id).ok_or("unknown tab")?;
-        tab.page.set_bounds(bounds)?;
-        tab.page.set_visible(true)?;
-        tab.page.focus()?;
+        tab.page.set_viewport(self.current_viewport)?;
+        if self.current_viewport.has_area() {
+            tab.page.focus()?;
+        }
         tab.page.refresh_history_state()?;
         if changed {
             self.events
@@ -144,11 +148,20 @@ impl BrowserWindow {
         }
     }
 
-    pub fn resize(&mut self) -> BrowserResult<()> {
+    pub fn set_viewport(&mut self, viewport: ViewportBounds) -> BrowserResult<()> {
+        if !viewport.is_valid() {
+            return Err("invalid viewport bounds".into());
+        }
+        if self.current_viewport == viewport {
+            return Ok(());
+        }
+        self.current_viewport = viewport;
         if let Some(tab_id) = self.tabs.active_id() {
-            let bounds = BrowserPage::viewport_bounds(&self.native)?;
-            if let Some(tab) = self.tabs.get(tab_id) {
-                tab.page.set_bounds(bounds)?;
+            if let Some(tab) = self.tabs.get_mut(tab_id) {
+                tab.page.set_viewport(viewport)?;
+                if viewport.has_area() {
+                    tab.page.focus()?;
+                }
             }
         }
         Ok(())

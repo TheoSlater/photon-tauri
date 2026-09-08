@@ -36,4 +36,4 @@ panic = "abort"
 strip = true
 
 [patch.crates-io]
-wry = { path = "wry-compat" }
+wry = { path = "../../wry" }

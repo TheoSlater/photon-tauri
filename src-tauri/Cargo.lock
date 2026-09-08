@@ -3316,7 +3316,7 @@ dependencies = [
  "webkit2gtk",
  "webview2-com 0.38.2",
  "windows 0.61.3",
- "wry 0.55.1",
+ "wry 0.55.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -4535,8 +4535,51 @@ dependencies = [
 
 [[package]]
 name = "wry"
+version = "0.55.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "186f9871daa55fd9c016578b810d149de58367113db7fb72b462d2323ce19514"
+dependencies = [
+ "base64 0.22.1",
+ "block2",
+ "cookie",
+ "crossbeam-channel",
+ "dirs 6.0.0",
+ "dom_query 0.27.0",
+ "dpi",
+ "dunce",
+ "gdkx11",
+ "gtk",
+ "http",
+ "javascriptcore-rs",
+ "jni",
+ "libc",
+ "ndk",
+ "objc2",
+ "objc2-app-kit",
+ "objc2-core-foundation",
+ "objc2-foundation",
+ "objc2-ui-kit",
+ "objc2-web-kit",
+ "once_cell",
+ "percent-encoding",
+ "raw-window-handle",
+ "sha2",
+ "soup3",
+ "tao-macros",
+ "thiserror 2.0.20",
+ "url",
+ "webkit2gtk",
+ "webkit2gtk-sys",
+ "webview2-com 0.38.2",
+ "windows 0.61.3",
+ "windows-core 0.61.2",
+ "windows-version",
+ "x11-dl",
+]
+
+[[package]]
+name = "wry"
 version = "0.57.0"
-source = "git+https://github.com/TheoSlater/wry?branch=dev#125a006db9e9a8570aa7960d7891a96a5ac61910"
 dependencies = [
  "base64 0.22.1",
  "block2",

@@ -16,11 +16,8 @@ pub enum BrowserEvent {
     TitleChanged { tab_id: TabId, title: String },
 }
 
-pub fn install(window: &tauri::Window) {
+pub fn install(window: &tauri::WebviewWindow) {
     window.on_window_event(|event| {
-        if matches!(event, tauri::WindowEvent::Resized { .. }) {
-            super::window::with_active(|browser| browser.resize());
-        }
         if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
             super::window::drop_active();
         }

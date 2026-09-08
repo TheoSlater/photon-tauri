@@ -2,13 +2,31 @@ use super::BrowserResult;
 use crate::platform;
 use wry::{Rect, WebViewBuilder, WebViewRenderMode};
 
+#[cfg(target_os = "windows")]
+use wry::{Theme, WebViewBuilderExtWindows};
+
+const SYSTEM_COLOR_SCHEME_SCRIPT: &str = r#"
+  (() => {
+    const apply = () => {
+      if (document.documentElement) {
+        document.documentElement.style.colorScheme = "light dark";
+      }
+    };
+    if (document.documentElement) {
+      apply();
+    } else {
+      document.addEventListener("DOMContentLoaded", apply, { once: true });
+    }
+  })();
+"#;
+
 pub struct BrowserWebView {
     pub(crate) page: platform::PlatformPage,
 }
 
 impl BrowserWebView {
     pub fn create(
-        window: &tauri::Window,
+        window: &tauri::WebviewWindow,
         host: &platform::BrowserHost,
         bounds: Rect,
         url: &str,
@@ -20,10 +38,13 @@ impl BrowserWebView {
             .with_render_mode(WebViewRenderMode::Composited)
             .with_bounds(bounds)
             .with_focused(false)
+            .with_initialization_script(SYSTEM_COLOR_SCHEME_SCRIPT)
             .with_navigation_handler(navigation)
             .with_on_page_load_handler(load)
             .with_document_title_changed_handler(title)
             .with_url(url);
+        #[cfg(target_os = "windows")]
+        let builder = builder.with_theme(Theme::Auto);
         Ok(Self {
             page: platform::build_page(window, host, builder)?,
         })

@@ -24,6 +24,7 @@ pub fn run() {
             browser_back,
             browser_forward,
             browser_get_state,
+            browser_set_viewport,
         ])
         .run(tauri::generate_context!())
         .expect("photon: failed to run");

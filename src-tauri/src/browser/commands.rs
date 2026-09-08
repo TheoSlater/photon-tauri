@@ -3,6 +3,7 @@ use super::BrowserResult;
 use super::{
     navigation::NavigationRequest,
     tab::TabSnapshot,
+    viewport::ViewportBounds,
     window::{self, BrowserStateSnapshot},
 };
 use std::sync::mpsc;
@@ -75,4 +76,9 @@ pub fn browser_forward(app: tauri::AppHandle, tab_id: TabId) -> Result<(), Strin
 #[tauri::command]
 pub fn browser_get_state(app: tauri::AppHandle) -> Result<BrowserStateSnapshot, String> {
     on_main(app, |browser| Ok(browser.state()))
+}
+
+#[tauri::command]
+pub fn browser_set_viewport(app: tauri::AppHandle, bounds: ViewportBounds) -> Result<(), String> {
+    on_main(app, move |browser| browser.set_viewport(bounds))
 }
