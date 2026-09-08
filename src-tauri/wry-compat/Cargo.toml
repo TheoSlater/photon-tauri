@@ -1,0 +1,25 @@
+[package]
+name = "wry"
+version = "0.55.1"
+edition = "2021"
+
+[lib]
+path = "lib.rs"
+
+[features]
+default = ["os-webview", "x11"]
+protocol = []
+os-webview = ["photon-wry/os-webview"]
+linux-body = ["photon-wry/linux-body"]
+x11 = ["photon-wry/x11"]
+devtools = ["photon-wry/devtools"]
+mac-proxy = ["photon-wry/mac-proxy"]
+tracing = ["photon-wry/tracing"]
+fullscreen = []
+transparent = []
+
+[dependencies.photon-wry]
+package = "wry"
+git = "https://github.com/TheoSlater/wry"
+branch = "dev"
+default-features = false
