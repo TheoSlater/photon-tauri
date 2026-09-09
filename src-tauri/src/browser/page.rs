@@ -1,7 +1,6 @@
 use super::BrowserResult;
 use super::{
-    events::BrowserEvent, ids::*, navigation::NavigationRequest, overlays::OverlayRegistry,
-    viewport::ViewportBounds,
+    events::BrowserEvent, ids::*, navigation::NavigationRequest, viewport::ViewportBounds,
 };
 use crate::platform;
 use serde::{Deserialize, Serialize};
@@ -35,7 +34,6 @@ impl BrowserPage {
         tab_id: TabId,
         events: super::events::EventQueue,
         initial_viewport: ViewportBounds,
-        overlays: OverlayRegistry,
     ) -> BrowserResult<Self> {
         let state = Rc::new(RefCell::new(PageState {
             url: Some(url.clone()),
@@ -47,8 +45,6 @@ impl BrowserPage {
         let title_state = Rc::clone(&state);
         let title_events = events.clone();
         let viewport = Rc::new(RefCell::new(initial_viewport));
-        let hit_test_viewport = Rc::clone(&viewport);
-        let hit_test_overlays = overlays;
         let webview = super::webview::BrowserWebView::create(
             window,
             host,
@@ -81,22 +77,6 @@ impl BrowserPage {
                 title_events
                     .borrow_mut()
                     .push(BrowserEvent::TitleChanged { tab_id, title });
-            },
-            move |x, y| {
-                let viewport = *hit_test_viewport.borrow();
-                if hit_test_overlays
-                    .hit_test(viewport.x + x, viewport.y + y)
-                    .is_some()
-                {
-                    return false;
-                }
-                !matches!(
-                    hit_test_overlays.outside_mode(),
-                    Some(
-                        super::overlays::OverlayInteractionMode::Dismiss
-                            | super::overlays::OverlayInteractionMode::Modal
-                    )
-                )
             },
         )?;
         Ok(Self {

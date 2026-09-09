@@ -2,7 +2,6 @@ pub mod commands;
 pub mod events;
 pub mod ids;
 pub mod navigation;
-pub mod overlays;
 pub mod page;
 pub mod tab;
 pub mod tabs;

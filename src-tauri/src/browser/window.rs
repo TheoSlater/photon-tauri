@@ -3,7 +3,6 @@ use super::{
     events::{BrowserEvent, EventQueue, EVENT_NAME},
     ids::{BrowserWindowId, PageId, TabId},
     navigation::NavigationRequest,
-    overlays::{OverlayRegion, OverlayRegistry},
     page::BrowserPage,
     tab::{Tab, TabSnapshot},
     tabs::TabManager,
@@ -23,7 +22,6 @@ pub struct BrowserWindow {
     events: EventQueue,
     app: tauri::AppHandle,
     current_viewport: ViewportBounds,
-    overlays: OverlayRegistry,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -43,7 +41,6 @@ impl BrowserWindow {
             events: Rc::new(RefCell::new(Vec::new())),
             app,
             current_viewport: ViewportBounds::default(),
-            overlays: OverlayRegistry::default(),
         };
         browser.create_tab(DEFAULT_URL.to_string())?;
         Ok(browser)
@@ -59,7 +56,6 @@ impl BrowserWindow {
             tab_id,
             self.events.clone(),
             self.current_viewport,
-            self.overlays.clone(),
         )?;
         let mut tab = Tab {
             id: tab_id,
@@ -161,7 +157,6 @@ impl BrowserWindow {
         }
         self.current_viewport = viewport;
         self.host.set_viewport(viewport.to_rect());
-        self.sync_overlay_input();
         if let Some(tab_id) = self.tabs.active_id() {
             if let Some(tab) = self.tabs.get_mut(tab_id) {
                 tab.page.set_viewport(viewport)?;
@@ -171,23 +166,6 @@ impl BrowserWindow {
             }
         }
         Ok(())
-    }
-
-    pub fn register_overlay(&mut self, region: OverlayRegion) -> BrowserResult<()> {
-        self.overlays.register(region)?;
-        self.sync_overlay_input();
-        Ok(())
-    }
-
-    pub fn unregister_overlay(&mut self, id: &str) -> BrowserResult<()> {
-        self.overlays.unregister(id);
-        self.sync_overlay_input();
-        Ok(())
-    }
-
-    fn sync_overlay_input(&self) {
-        self.host
-            .set_overlay_regions(self.current_viewport.to_rect(), &self.overlays.regions());
     }
 
     fn emit_events(&self) {

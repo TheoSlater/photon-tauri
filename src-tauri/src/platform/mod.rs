@@ -11,16 +11,7 @@ pub struct BrowserHost {
     #[cfg(target_os = "linux")]
     pub(crate) page_origin: std::rc::Rc<std::cell::Cell<(f64, f64)>>,
     #[cfg(target_os = "linux")]
-    pub(crate) frontend: gtk::Widget,
-    #[cfg(target_os = "linux")]
-    pub(crate) overlay: gtk::Overlay,
-    #[cfg(target_os = "linux")]
     pub(crate) input_viewport: std::rc::Rc<std::cell::Cell<wry::Rect>>,
-    #[cfg(target_os = "linux")]
-    pub(crate) overlay_regions:
-        std::rc::Rc<std::cell::RefCell<Vec<crate::browser::overlays::OverlayRegion>>>,
-    #[cfg(target_os = "linux")]
-    pub(crate) pointer_position: std::rc::Rc<std::cell::Cell<Option<(f64, f64)>>>,
 }
 
 pub struct PlatformPage {
@@ -65,17 +56,6 @@ impl BrowserHost {
         linux::set_viewport(self, bounds);
         #[cfg(not(target_os = "linux"))]
         let _ = bounds;
-    }
-
-    pub fn set_overlay_regions(
-        &self,
-        viewport: wry::Rect,
-        regions: &[crate::browser::overlays::OverlayRegion],
-    ) {
-        #[cfg(target_os = "linux")]
-        linux::set_overlay_regions(self, viewport, regions);
-        #[cfg(not(target_os = "linux"))]
-        let _ = (viewport, regions);
     }
 }
 

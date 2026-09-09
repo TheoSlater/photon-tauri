@@ -33,7 +33,6 @@ impl BrowserWebView {
         navigation: impl Fn(String) -> bool + 'static,
         load: impl Fn(wry::PageLoadEvent, String) + 'static,
         title: impl Fn(String) + 'static,
-        hit_test: impl Fn(f64, f64) -> bool + 'static,
     ) -> BrowserResult<Self> {
         let builder = WebViewBuilder::new()
             .with_render_mode(WebViewRenderMode::Composited)
@@ -43,7 +42,6 @@ impl BrowserWebView {
             .with_navigation_handler(navigation)
             .with_on_page_load_handler(load)
             .with_document_title_changed_handler(title)
-            .with_hit_test_handler(hit_test)
             .with_url(url);
         #[cfg(target_os = "windows")]
         let builder = builder.with_theme(Theme::Auto);

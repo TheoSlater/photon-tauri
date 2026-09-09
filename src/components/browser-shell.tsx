@@ -1,7 +1,5 @@
 import type { PropsWithChildren } from "react";
 import { useNativeWebViewBounds } from "../use-native-webview-bounds";
-import { OverlayTest } from "./overlay-test";
-import { PhotonOverlayRoot } from "./photon-overlay";
 import { PhotonTitlebar } from "./photon-titlebar";
 
 export function WebViewFrame() {
@@ -20,9 +18,6 @@ export function BrowserShell() {
       <BrowserViewport>
         <WebViewFrame />
       </BrowserViewport>
-      <PhotonOverlayRoot>
-        <OverlayTest />
-      </PhotonOverlayRoot>
     </main>
   );
 }
