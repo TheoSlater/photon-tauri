@@ -10,8 +10,9 @@ pub fn build_page<'a>(
     window: &tauri::Window,
     _host: &BrowserHost,
     builder: WebViewBuilder<'a>,
+    _bounds: wry::Rect,
 ) -> Result<PlatformPage, wry::Error> {
     Ok(PlatformPage {
-        webview: builder.build(window)?,
+        webview: builder.build_as_child(window)?,
     })
 }

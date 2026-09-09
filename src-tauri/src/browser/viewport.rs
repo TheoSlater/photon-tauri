@@ -29,6 +29,14 @@ impl ViewportBounds {
         self.width > 0.0 && self.height > 0.0
     }
 
+    pub fn contains(self, x: f64, y: f64) -> bool {
+        self.has_area()
+            && x >= self.x
+            && y >= self.y
+            && x < self.x + self.width
+            && y < self.y + self.height
+    }
+
     pub fn to_rect(self) -> Rect {
         Rect {
             position: LogicalPosition::new(self.x, self.y).into(),

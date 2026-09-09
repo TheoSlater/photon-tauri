@@ -2,6 +2,7 @@ use super::ids::TabId;
 use super::BrowserResult;
 use super::{
     navigation::NavigationRequest,
+    overlays::OverlayRegion,
     tab::TabSnapshot,
     viewport::ViewportBounds,
     window::{self, BrowserStateSnapshot},
@@ -81,4 +82,17 @@ pub fn browser_get_state(app: tauri::AppHandle) -> Result<BrowserStateSnapshot, 
 #[tauri::command]
 pub fn browser_set_viewport(app: tauri::AppHandle, bounds: ViewportBounds) -> Result<(), String> {
     on_main(app, move |browser| browser.set_viewport(bounds))
+}
+
+#[tauri::command]
+pub fn browser_register_overlay(
+    app: tauri::AppHandle,
+    overlay: OverlayRegion,
+) -> Result<(), String> {
+    on_main(app, move |browser| browser.register_overlay(overlay))
+}
+
+#[tauri::command]
+pub fn browser_unregister_overlay(app: tauri::AppHandle, id: String) -> Result<(), String> {
+    on_main(app, move |browser| browser.unregister_overlay(&id))
 }

@@ -1,6 +1,7 @@
 use super::BrowserResult;
 use super::{
-    events::BrowserEvent, ids::*, navigation::NavigationRequest, viewport::ViewportBounds,
+    events::BrowserEvent, ids::*, navigation::NavigationRequest, overlays::OverlayRegistry,
+    viewport::ViewportBounds,
 };
 use crate::platform;
 use serde::{Deserialize, Serialize};
@@ -22,6 +23,7 @@ pub struct BrowserPage {
     pub id: PageId,
     state: Rc<RefCell<PageState>>,
     webview: Option<super::webview::BrowserWebView>,
+    viewport: Rc<RefCell<ViewportBounds>>,
 }
 
 impl BrowserPage {
@@ -33,6 +35,7 @@ impl BrowserPage {
         tab_id: TabId,
         events: super::events::EventQueue,
         initial_viewport: ViewportBounds,
+        overlays: OverlayRegistry,
     ) -> BrowserResult<Self> {
         let state = Rc::new(RefCell::new(PageState {
             url: Some(url.clone()),
@@ -43,6 +46,9 @@ impl BrowserPage {
         let page_events = events.clone();
         let title_state = Rc::clone(&state);
         let title_events = events.clone();
+        let viewport = Rc::new(RefCell::new(initial_viewport));
+        let hit_test_viewport = Rc::clone(&viewport);
+        let hit_test_overlays = overlays;
         let webview = super::webview::BrowserWebView::create(
             window,
             host,
@@ -76,11 +82,28 @@ impl BrowserPage {
                     .borrow_mut()
                     .push(BrowserEvent::TitleChanged { tab_id, title });
             },
+            move |x, y| {
+                let viewport = *hit_test_viewport.borrow();
+                if hit_test_overlays
+                    .hit_test(viewport.x + x, viewport.y + y)
+                    .is_some()
+                {
+                    return false;
+                }
+                !matches!(
+                    hit_test_overlays.outside_mode(),
+                    Some(
+                        super::overlays::OverlayInteractionMode::Dismiss
+                            | super::overlays::OverlayInteractionMode::Modal
+                    )
+                )
+            },
         )?;
         Ok(Self {
             id,
             state,
             webview: Some(webview),
+            viewport,
         })
     }
 
@@ -93,6 +116,7 @@ impl BrowserPage {
                 ..Default::default()
             })),
             webview: None,
+            viewport: Rc::new(RefCell::new(ViewportBounds::default())),
         }
     }
 
@@ -163,6 +187,7 @@ impl BrowserPage {
     }
 
     pub fn set_viewport(&mut self, bounds: ViewportBounds) -> BrowserResult<()> {
+        *self.viewport.borrow_mut() = bounds;
         self.set_bounds(bounds.to_rect())?;
         self.set_visible(bounds.has_area())
     }

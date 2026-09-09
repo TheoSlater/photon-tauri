@@ -63,7 +63,6 @@
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   /* Photon-specific tokens */
-  --chrome-height: 40px;
   --tab-height: 34px;
   --control-size: 30px;
 
@@ -206,7 +205,7 @@ html {
 
 body {
   overflow: hidden;
-  background: var(--background);
+  background: transparent;
   color: var(--foreground);
   user-select: none;
 }
@@ -237,20 +236,48 @@ textarea {
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  background: var(--background);
+  background: transparent;
 }
 
-.photon-topbar {
-  flex: 0 0 40px;
-  z-index: 1;
+.photon-titlebar {
+  flex: 0 0 36px;
   display: flex;
   align-items: center;
   min-width: 0;
-  padding: 0 8px;
-  color: var(--muted);
   background: var(--background);
+  border-bottom: 1px solid var(--border);
   font-size: 12px;
   line-height: 1;
+}
+
+.photon-titlebar-drag-region {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  align-self: stretch;
+  min-width: 0;
+  padding-left: 12px;
+}
+
+.photon-window-controls {
+  display: flex;
+  align-self: stretch;
+}
+
+.photon-window-control {
+  color: var(--foreground);
+  background: transparent;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.photon-window-control:hover {
+  background: var(--default);
+}
+
+.photon-window-control:last-child:hover {
+  color: var(--danger-foreground);
+  background: var(--danger);
 }
 
 .photon-page-area {
@@ -272,6 +299,41 @@ textarea {
   border: 1px solid var(--border);
   border-radius: 4px;
   overflow: hidden;
+}
+
+.photon-overlay-root {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.photon-overlay {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.photon-overlay-test {
+  top: 56px;
+  right: 24px;
+}
+
+.photon-overlay-test-upper {
+  top: 72px;
+  right: 48px;
+}
+
+.photon-overlay-test-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  color: white;
+  background: #20242b;
+  border: 1px solid #586170;
+  border-radius: 4px;
+  font-size: 12px;
 }
 
 /* Native rounded clipping is backend-dependent and intentionally deferred. */
