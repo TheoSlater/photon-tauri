@@ -28,18 +28,19 @@ pub fn new_host(window: &tauri::WebviewWindow) -> Result<BrowserHost, wry::Error
     vbox.remove(&frontend);
 
     let frontend: gtk::Widget = frontend.upcast();
-    let content = gtk::Fixed::new();
+    let overlay = gtk::Overlay::new();
+    overlay.add(&root);
+    overlay.add_overlay(&frontend);
+    overlay.set_overlay_pass_through(&frontend, true);
     root.set_halign(gtk::Align::Start);
     root.set_valign(gtk::Align::Start);
-    content.show();
     root.show();
-    frontend.show();
-    vbox.pack_start(&content, true, true, 0);
-    vbox.pack_start(&root, true, true, 0);
-    vbox.pack_start(&frontend, true, true, 0);
+    overlay.show_all();
+    vbox.pack_start(&overlay, true, true, 0);
     Ok(BrowserHost {
         root,
         page_origin,
+        overlay,
         input_viewport,
     })
 }

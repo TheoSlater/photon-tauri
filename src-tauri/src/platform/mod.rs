@@ -11,6 +11,9 @@ pub struct BrowserHost {
     #[cfg(target_os = "linux")]
     pub(crate) page_origin: std::rc::Rc<std::cell::Cell<(f64, f64)>>,
     #[cfg(target_os = "linux")]
+    #[allow(dead_code)] // kept alive for GTK layout; widgets must not be dropped
+    pub(crate) overlay: gtk::Overlay,
+    #[cfg(target_os = "linux")]
     pub(crate) input_viewport: std::rc::Rc<std::cell::Cell<wry::Rect>>,
 }
 
